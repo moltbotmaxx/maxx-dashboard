@@ -2,10 +2,10 @@
   "weather": {
     "location": "Alajuela",
     "condition": "Cielo Despejado",
-    "temp_c": "25",
+    "temp_c": "24",
     "max_temp_c": "30",
     "min_temp_c": "20",
-    "wind_kmh": "11",
+    "wind_kmh": "6",
     "humidity": "80",
     "uv_index": "9 (Muy Alto)",
     "prob_rain": "80"
@@ -14,14 +14,14 @@
     "username": "@chatgptricks",
     "followers": "2.45M",
     "growth": "+1,139",
-    "last_post_placeholder": "Último Post"
+    "last_post_placeholder": "\u00daltimo Post"
   },
   "maxx_status": {
-    "date": "Lunes, 16 Feb",
+    "date": "Monday, 16 feb",
     "context_percent": 37,
     "tokens_in": "43k",
-    "telegram_status": "✓",
-    "whatsapp_status": "✓",
+    "telegram_status": "\u2713",
+    "whatsapp_status": "\u2713",
     "label": "Maxx Moltbot"
   },
   "news": {
