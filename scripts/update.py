@@ -12,49 +12,102 @@ HTML_FILE = os.path.join(PROJECT_DIR, "index.html")
 FTP_HOST = "192.168.100.12"
 FTP_PORT = "2221"
 
+# Weather code to emoji mapping
+WEATHER_CODES = {
+    0: "☀️", 1: "🌤️", 2: "⛅", 3: "☁️",
+    45: "🌫️", 48: "🌫️",
+    51: "🌦️", 53: "🌦️", 55: "🌧️",
+    61: "🌧️", 63: "🌧️", 65: "🌧️",
+    71: "❄️", 73: "❄️", 75: "❄️",
+    80: "🌦️", 81: "🌧️", 82: "🌧️",
+    95: "⛈️", 96: "⛈️", 99: "⛈️",
+}
+
+def code_to_icon(code):
+    return WEATHER_CODES.get(code, "🌤️")
+
+def code_to_condition(code):
+    if code == 0: return "Cielo Despejado"
+    elif code <= 3: return "Parcialmente Nublado"
+    elif code <= 48: return "Niebla"
+    elif code <= 55: return "Llovizna"
+    elif code <= 65: return "Lluvia"
+    elif code <= 75: return "Nieve"
+    elif code <= 82: return "Chubascos"
+    elif code >= 95: return "Tormenta"
+    return "Variable"
+
 def update_data():
     print("Updating data...")
-    # Read current data
     with open(DATA_FILE, 'r') as f:
         data = json.load(f)
 
-    # 1. Update Weather (Mocking skill call behavior here for automation)
-    # In a real run, we'd call open-meteo or wttr.in
+    # Fetch weather with full hourly + daily data
     try:
-        # Simple curl to open-meteo for Alajuela
-        res = subprocess.check_output(['curl', '-s', 'https://api.open-meteo.com/v1/forecast?latitude=10.0163&longitude=-84.2116&current_weather=true&hourly=relative_humidity_2m,uv_index'], text=True)
-        w_data = json.loads(res)
-        data['weather']['temp_c'] = str(round(w_data['current_weather']['temperature']))
-        data['weather']['wind_kmh'] = str(round(w_data['current_weather']['windspeed']))
-        # We'd map weathercodes to conditions here
-    except:
-        pass
+        api_url = (
+            'https://api.open-meteo.com/v1/forecast'
+            '?latitude=10.0163&longitude=-84.2116'
+            '&current_weather=true'
+            '&hourly=temperature_2m,weathercode,apparent_temperature,relative_humidity_2m'
+            '&daily=temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max'
+            '&timezone=America/Costa_Rica'
+            '&forecast_days=1'
+        )
+        res = subprocess.check_output(['curl', '-s', api_url], text=True)
+        api = json.loads(res)
+        w = api['current_weather']
 
-    # 2. Update Date
-    data['maxx_status']['date'] = datetime.now().strftime("%A, %d %b").capitalize()
+        data['weather']['temp_c'] = str(round(w['temperature']))
+        data['weather']['wind_kmh'] = str(round(w['windspeed']))
+        data['weather']['condition'] = code_to_condition(w.get('weathercode', 0))
 
-    # Save data
+        # Daily
+        if 'daily' in api:
+            d = api['daily']
+            data['weather']['max_temp_c'] = str(round(d['temperature_2m_max'][0]))
+            data['weather']['min_temp_c'] = str(round(d['temperature_2m_min'][0]))
+            data['weather']['uv_index'] = str(round(d['uv_index_max'][0]))
+            data['weather']['prob_rain'] = str(round(d['precipitation_probability_max'][0]))
+
+        # Feels like + humidity from hourly
+        current_hour = datetime.now().hour
+        if 'hourly' in api:
+            h = api['hourly']
+            if 'apparent_temperature' in h and current_hour < len(h['apparent_temperature']):
+                data['weather']['feels_like_c'] = str(round(h['apparent_temperature'][current_hour]))
+            if 'relative_humidity_2m' in h and current_hour < len(h['relative_humidity_2m']):
+                data['weather']['humidity'] = str(round(h['relative_humidity_2m'][current_hour]))
+
+            # Hourly forecast (next 3 time slots)
+            hourly_temps = h.get('temperature_2m', [])
+            hourly_codes = h.get('weathercode', [])
+            hourly_times = h.get('time', [])
+            forecast = []
+            for offset in [3, 6, 9]:
+                idx = current_hour + offset
+                if idx < len(hourly_temps) and idx < len(hourly_codes):
+                    t = datetime.fromisoformat(hourly_times[idx])
+                    forecast.append({
+                        "time": t.strftime("%-I%p"),
+                        "icon": code_to_icon(hourly_codes[idx]),
+                        "temp": str(round(hourly_temps[idx]))
+                    })
+            if forecast:
+                data['weather']['hourly_forecast'] = forecast
+
+    except Exception as e:
+        print(f"Weather update failed: {e}")
+
+    # Update date + last update
+    now = datetime.now()
+    data['maxx_status']['date'] = now.strftime("%A, %d %b").capitalize()
+    data['maxx_status']['last_update_time'] = now.strftime("%H:%M")
+
+    # Save
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=2)
-    
+
     return data
-
-def update_html_static(data):
-    print("Injecting data into HTML for screenshotting...")
-    with open(HTML_FILE, 'r') as f:
-        content = f.read()
-
-    # Update hardcoded values in HTML to ensure screenshot is never empty
-    content = content.replace('id="w-loc">...', f'id="w-loc">{data["weather"]["location"]}')
-    content = content.replace('id="w-cond">...', f'id="w-cond">{data["weather"]["condition"]}')
-    content = content.replace('id="w-temp">...', f'id="w-temp">{data["weather"]["temp_c"]}°')
-    # ... and so on for all IDs. For a robust automation, we use a template engine or regex.
-    
-    # Simple strategy: Just make sure the HTML file in the repo ALWAYS has the latest state hardcoded 
-    # as well as the dynamic script.
-    
-    with open(HTML_FILE, 'w') as f:
-        f.write(content)
 
 def generate_and_upload():
     # Capture current counter
@@ -68,19 +121,12 @@ def generate_and_upload():
 
     new_num_1 = last_num + 1
     new_num_2 = last_num + 2
-    
+
     file_1 = f"Dashboard_{new_num_1:05d}.png"
     file_2 = f"Dashboard_{new_num_2:05d}.png"
-    
+
     print(f"Generating {file_1} and {file_2}...")
-    
-    # Take screenshot (This part requires the browser tool via OpenClaw API)
-    # For automation, we assume the agent runs this, so we'll just note the command
-    
-    # Final step: cleanup FTP
-    # lftp -c "open ...; rm Dashboard_old..."
 
 if __name__ == "__main__":
     data = update_data()
-    # update_html_static(data)
-    print("Automation script ready. Pending full browser integration.")
+    print("Automation script ready. Data updated with hourly forecast.")
