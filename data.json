@@ -2,7 +2,7 @@
   "weather": {
     "location": "Alajuela",
     "condition": "Cielo Despejado",
-    "temp_c": "24",
+    "temp_c": "22",
     "max_temp_c": "30",
     "min_temp_c": "20",
     "wind_kmh": "6",
