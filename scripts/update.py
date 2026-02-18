@@ -324,8 +324,9 @@ def generate_and_upload():
         subprocess.call(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; mrm frame_*; mrm Dashboard_*'], stderr=subprocess.DEVNULL)
         
         print("Uploading new frames...")
-        subprocess.check_call(['curl', '-s', '-T', LATEST_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/frame_00001.png'])
-        subprocess.check_call(['curl', '-s', '-T', LATEST_COPY_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/frame_00001_copy.png'])
+        # Corrected: Upload actual filenames created by capture.js
+        subprocess.check_call(['curl', '-s', '-T', LATEST_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/{os.path.basename(LATEST_PNG)}'])
+        subprocess.check_call(['curl', '-s', '-T', LATEST_COPY_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/{os.path.basename(LATEST_COPY_PNG)}'])
         
         print("FTP Sync Complete.")
 
