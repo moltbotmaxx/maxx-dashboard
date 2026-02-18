@@ -1,7 +1,7 @@
 {
   "weather": {
     "temp_c": "22",
-    "wind_kmh": "9",
+    "wind_kmh": "10",
     "condition": "Cielo Despejado",
     "bg_image": "images/weather_night.png",
     "theme": "night",
