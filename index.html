@@ -859,20 +859,23 @@
         async function go() {
             try {
                 // Fetch both data sources in parallel
-                const [rData, rWeather, rInsta] = await Promise.all([
+                const [rData, rWeather, rInsta, rNews] = await Promise.all([
                     fetch('data.json?' + Date.now()),
                     fetch('weather.json?' + Date.now()),
-                    fetch('instagram.json?' + Date.now())
+                    fetch('instagram.json?' + Date.now()),
+                    fetch('news.json?' + Date.now())
                 ]);
 
-                if (!rData.ok || !rWeather.ok || !rInsta.ok) return;
+                if (!rData.ok || !rWeather.ok || !rInsta.ok || !rNews.ok) return;
 
                 const d = await rData.json();
                 const wData = await rWeather.json();
                 const iData = await rInsta.json();
+                const nData = await rNews.json();
 
                 const w = wData.weather;
                 const ig = iData.instagram;
+                const n = nData.news;
                 document.getElementById('w-loc').textContent = w.location;
                 document.getElementById('w-cond').textContent = w.condition;
                 document.getElementById('w-temp').textContent = w.temp_c;
@@ -904,13 +907,15 @@
                 document.getElementById('m-ctx-p').textContent = m.context_percent + '%';
                 document.getElementById('m-ctx-bar').style.width = m.context_percent + '%';
                 document.getElementById('m-tokens').textContent = '🧮 ' + m.tokens_in + ' tokens';
-                if (m.last_update_time) document.getElementById('m-update').textContent = m.last_update_time;
-                if (m.mood) document.getElementById('m-mood').textContent = m.mood;
-                if (m.date) document.getElementById('m-date').textContent = m.date;
-                var nn = d.news;
-                document.getElementById('n-tag').textContent = nn.tag;
-                document.getElementById('n-head').textContent = nn.headline;
-                if (nn.image_url) document.getElementById('n-bg').style.backgroundImage = "url('" + nn.image_url + "')";
+                document.getElementById('m-date').textContent = m.date;
+                document.getElementById('m-mood').textContent = m.mood;
+                document.getElementById('m-update').textContent = m.last_update_time;
+                // News
+                // var n = d.news; // Now from nData
+                document.getElementById('n-tag').textContent = n.tag;
+                document.getElementById('n-head').textContent = n.headline;
+                document.getElementById('n-source').textContent = n.source;
+                document.getElementById('card-news').style.backgroundImage = "url('" + n.image_url + "')";
             } catch (e) { console.warn(e); }
         }
         go();

@@ -11,6 +11,7 @@ PROJECT_DIR = os.path.join(WORKSPACE, "projects", "smart-frame")
 DATA_FILE = os.path.join(PROJECT_DIR, "data.json")
 WEATHER_FILE = os.path.join(PROJECT_DIR, "weather.json")
 INSTAGRAM_FILE = os.path.join(PROJECT_DIR, "instagram.json")
+NEWS_FILE = os.path.join(PROJECT_DIR, "news.json")
 HTML_FILE = os.path.join(PROJECT_DIR, "index.html")
 FTP_HOST = "192.168.100.12"
 FTP_PORT = "2221"
@@ -61,6 +62,14 @@ def update_data():
     if 'instagram' in data:
         ig_data['instagram'] = data['instagram'] # type: ignore
         del data['instagram']
+
+    # Initialize separate news dict
+    news_data: Dict[str, Any] = { "news": {} }
+    
+    # If news is in data (migration), move it initially (will be overwritten by API)
+    if 'news' in data:
+        news_data['news'] = data['news'] # type: ignore
+        del data['news']
 
     # Fetch weather with full hourly + daily data
     try:
@@ -216,6 +225,45 @@ def update_data():
     except Exception as e:
         print(f"Weather update failed: {e}")
 
+    # --- NEWS UPDATE ---
+    try:
+        print("Fetching News...")
+        news_api_url = "https://actually-relevant-api.onrender.com/api/stories?issueSlug=artificial-intelligence"
+        news_res = subprocess.check_output(['curl', '-s', news_api_url], text=True)
+        news_json = json.loads(news_res)
+        
+        if 'data' in news_json and len(news_json['data']) > 0:
+            story = news_json['data'][0] # Get latest story
+            
+            # Map API fields to our format
+            # API: title, sourceTitle, imageUrl (maybe?), summary
+            # We need: tag, headline, image_url, source
+            
+            # Check for image (the API response I saw didn't have imageUrl in the root of the story object, 
+            # might need to check if it exists or use a default if missing. 
+            # The previous sample output didn't show imageUrl clearly in the truncated view, 
+            # but usually these APIs have it. If not, we keep the placeholder or try to find one.)
+            # Let's assume 'imageUrl' might be there or we use a fallback.
+            
+            img = story.get('imageUrl')
+            if not img:
+                # Fallback AI image if no image provided
+                img = "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800"
+            
+            news_data['news'] = {
+                "tag": story.get('titleLabel', 'AI News'),
+                "headline": story.get('title', 'No headlines available'),
+                "image_url": img,
+                "source": story.get('sourceTitle', 'Actually Relevant'),
+                "summary": story.get('summary', '')
+            }
+            print(f"News updated: {story.get('title')}")
+        else:
+             print("No news stories found.")
+
+    except Exception as e:
+        print(f"News update failed: {e}")
+
     # Update date + last update
     now = datetime.now()
     data['maxx_status']['date'] = now.strftime("%A, %d %b").capitalize()
@@ -233,11 +281,15 @@ def update_data():
     with open(INSTAGRAM_FILE, 'w') as f:
         json.dump(ig_data, f, indent=2)
 
+    # Save News Data
+    with open(NEWS_FILE, 'w') as f:
+        json.dump(news_data, f, indent=2)
+
     # Save Main Data (Status, etc.)
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=2)
 
-    return data, weather_data, ig_data
+    return data, weather_data, ig_data, news_data
 
 def generate_and_upload():
     # Capture current counter

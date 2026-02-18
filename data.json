@@ -6,12 +6,7 @@
     "telegram_status": "\u2713",
     "whatsapp_status": "\u2713",
     "label": "Maxx Moltbot",
-    "last_update_time": "00:03",
+    "last_update_time": "00:15",
     "mood": "\ud83d\ude80"
-  },
-  "news": {
-    "tag": "Breaking News",
-    "headline": "OpenClaw founder Peter Steinberger is joining OpenAI",
-    "image_url": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800"
   }
 }
