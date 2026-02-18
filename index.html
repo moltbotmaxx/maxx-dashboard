@@ -769,7 +769,7 @@
                     </div>
                     <div class="m-info">
                         <div class="m-name" id="m-label">Maxx Moltbot</div>
-                        <div class="m-sub">AI Assistant · Active</div>
+                        <div class="m-sub" id="m-sub">AI Assistant · Active</div>
                         <div class="m-mood">
                             <span class="m-mood-emoji" id="m-mood">🚀</span>
                             <span>Productivo</span>
@@ -786,13 +786,8 @@
                     </div>
                     <div class="m-tokens" id="m-tokens">🧮 43k tokens</div>
                 </div>
-                <div class="m-comms">
-                    <div class="m-pill">
-                        <div class="m-dot"></div>Telegram
-                    </div>
-                    <div class="m-pill">
-                        <div class="m-dot"></div>WhatsApp
-                    </div>
+                <div class="m-comms" id="m-ops">
+                    <!-- Operations populated by JS -->
                 </div>
             </div>
         </div>
@@ -827,7 +822,7 @@
         </div>
 
         <!-- NEWS -->
-        <div class="card-news" id="n-bg"
+        <div class="card-news" id="card-news"
             style="background-image:url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800')">
             <div class="n-grad"></div>
             <div class="n-inner">
@@ -836,7 +831,7 @@
                 </div>
                 <div>
                     <div class="n-head" id="n-head">OpenClaw founder Peter Steinberger is joining OpenAI</div>
-                    <div class="n-source">via TechCrunch</div>
+                    <div class="n-source" id="n-source">via TechCrunch</div>
                 </div>
             </div>
         </div>
@@ -858,24 +853,32 @@
         }
         async function go() {
             try {
-                // Fetch both data sources in parallel
-                const [rData, rWeather, rInsta, rNews] = await Promise.all([
+                // Fetch all data sources in parallel
+                const [rData, rWeather, rInsta, rNews, rMoltbot] = await Promise.all([
                     fetch('data.json?' + Date.now()),
                     fetch('weather.json?' + Date.now()),
                     fetch('instagram.json?' + Date.now()),
-                    fetch('news.json?' + Date.now())
+                    fetch('news.json?' + Date.now()),
+                    fetch('moltbot.json?' + Date.now())
                 ]);
 
-                if (!rData.ok || !rWeather.ok || !rInsta.ok || !rNews.ok) return;
+                if (!rData.ok || !rWeather.ok || !rInsta.ok || !rNews.ok || !rMoltbot.ok) {
+                    console.error("One or more fetches failed", rData, rWeather, rInsta, rNews, rMoltbot);
+                    return;
+                }
 
                 const d = await rData.json();
                 const wData = await rWeather.json();
                 const iData = await rInsta.json();
                 const nData = await rNews.json();
+                const mData = await rMoltbot.json();
+
+                console.log("Moltbot Data:", mData); // DEBUG
 
                 const w = wData.weather;
                 const ig = iData.instagram;
                 const n = nData.news;
+                const mb = mData.moltbot;
                 document.getElementById('w-loc').textContent = w.location;
                 document.getElementById('w-cond').textContent = w.condition;
                 document.getElementById('w-temp').textContent = w.temp_c;
@@ -903,13 +906,32 @@
                 if (document.getElementById('ig-rate')) document.getElementById('ig-rate').textContent = ig.engagement_rate;
                 if (document.getElementById('ig-last')) document.getElementById('ig-last').textContent = ig.last_post_placeholder || 'Último Post';
                 var m = d.maxx_status;
-                document.getElementById('m-label').textContent = m.label;
-                document.getElementById('m-ctx-p').textContent = m.context_percent + '%';
-                document.getElementById('m-ctx-bar').style.width = m.context_percent + '%';
-                document.getElementById('m-tokens').textContent = '🧮 ' + m.tokens_in + ' tokens';
-                document.getElementById('m-date').textContent = m.date;
-                document.getElementById('m-mood').textContent = m.mood;
-                document.getElementById('m-update').textContent = m.last_update_time;
+                // System
+                document.getElementById('m-label').textContent = m.label; // Keep name for now
+                document.getElementById('m-sub').textContent = mb.system.current_model + ' · ' + mb.state.logic_mode;
+
+                // Context
+                document.getElementById('m-ctx-p').textContent = mb.system.context_usage;
+                // Parse percent for width
+                document.getElementById('m-ctx-bar').style.width = mb.system.context_usage;
+
+                document.getElementById('m-tokens').textContent = '🧮 ' + mb.system.token_usage_daily + ' tokens';
+
+                // State
+                document.getElementById('m-date').textContent = m.date; // Keep date from python main
+                document.getElementById('m-mood').textContent = mb.state.system_mood;
+                document.getElementById('m-update').textContent = mb.operations.last_post_timestamp;
+
+                // Operations (New Fields) - reusing existing pills or adding text
+                // Let's repurpose the "Comms" section for Operations
+                const opsDiv = document.getElementById('m-ops');
+                if (opsDiv) {
+                    opsDiv.innerHTML = `
+                        <div class="m-pill"><div class="m-dot"></div>Goal: ${mb.operations.daily_goal_progress}</div>
+                        <div class="m-pill"><div class="m-dot"></div>ETA: ${mb.operations.next_post_eta}</div>
+                        <div class="m-pill" style="border-color:rgba(139, 92, 246, 0.3); color:rgba(139, 92, 246, 0.8)">${mb.state.last_action}</div>
+                    `;
+                }
                 // News
                 // var n = d.news; // Now from nData
                 document.getElementById('n-tag').textContent = n.tag;

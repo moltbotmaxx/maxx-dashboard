@@ -12,6 +12,7 @@ DATA_FILE = os.path.join(PROJECT_DIR, "data.json")
 WEATHER_FILE = os.path.join(PROJECT_DIR, "weather.json")
 INSTAGRAM_FILE = os.path.join(PROJECT_DIR, "instagram.json")
 NEWS_FILE = os.path.join(PROJECT_DIR, "news.json")
+MOLTBOT_FILE = os.path.join(PROJECT_DIR, "moltbot.json")
 HTML_FILE = os.path.join(PROJECT_DIR, "index.html")
 FTP_HOST = "192.168.100.12"
 FTP_PORT = "2221"
@@ -264,6 +265,29 @@ def update_data():
     except Exception as e:
         print(f"News update failed: {e}")
 
+    # --- MOLTBOT UPDATE (Dummy Data) ---
+    moltbot_data: Dict[str, Any] = {
+        "moltbot": {
+            "system": {
+                "current_model": "Gemini 2.0 Pro Experimental",
+                "token_usage_daily": "142k / 1M",
+                "context_usage": "45%",
+                "active_subagents": ["Twitter Crawler", "News Fetcher"]
+            },
+            "operations": {
+                "daily_goal_progress": "3/10",
+                "last_post_timestamp": datetime.now().strftime("%H:%M"),
+                "next_post_eta": "45m",
+                "last_post_cdn_url": "https://raw.githubusercontent.com/moltbotmaxx/memes/master/latest.png"
+            },
+            "state": {
+                "system_mood": "Hunting for crawfish facts 🦞",
+                "logic_mode": "Thinking",
+                "last_action": "Optimized social_brain.js"
+            }
+        }
+    }
+
     # Update date + last update
     now = datetime.now()
     data['maxx_status']['date'] = now.strftime("%A, %d %b").capitalize()
@@ -285,11 +309,15 @@ def update_data():
     with open(NEWS_FILE, 'w') as f:
         json.dump(news_data, f, indent=2)
 
+    # Save Moltbot Data
+    with open(MOLTBOT_FILE, 'w') as f:
+        json.dump(moltbot_data, f, indent=2)
+
     # Save Main Data (Status, etc.)
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=2)
 
-    return data, weather_data, ig_data, news_data
+    return data, weather_data, ig_data, news_data, moltbot_data
 
 def generate_and_upload():
     # Capture current counter
