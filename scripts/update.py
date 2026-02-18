@@ -315,8 +315,12 @@ def generate_and_upload():
 
         # 3. Generate screenshot using capture.js from URL
         print("Capturing screenshot from GitHub Pages...")
+        subprocess.check_call(['node', CAPTURE_JS])
+
+        # Create copy for double-frame systems
+        subprocess.check_call(['cp', LATEST_PNG, LATEST_COPY_PNG])
+
         # We use lftp to clear and curl to upload for reliability
-        print("Cleaning up FTP...")
         subprocess.call(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; mrm frame_*; mrm Dashboard_*'], stderr=subprocess.DEVNULL)
         
         print("Uploading new frames...")
