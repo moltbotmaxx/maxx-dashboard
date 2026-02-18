@@ -981,30 +981,41 @@
                 }
                 // News
                 // var n = d.news; // Now from nData
+                // News
                 const nm = n.featured || {};
-                const nList = n.list || [];
+                const s1 = n.secondary_1;
+                const s2 = n.secondary_2;
 
+                // Featured Story
                 document.getElementById('n-tag').textContent = nm.tag || 'AI News';
                 document.getElementById('n-head').textContent = nm.headline || 'No headlines available';
                 document.getElementById('n-source').textContent = nm.source || 'Unknown';
-
-                const nCard = document.getElementById('n-card'); // Correct ID from HTML update
+                const nCard = document.getElementById('n-card');
                 if (nm.image_url) {
                     nCard.style.backgroundImage = "url('" + nm.image_url + "')";
                 }
 
-                // Render News List
-                const listContainer = document.getElementById('n-list');
-                if (listContainer && nList.length > 0) {
-                    listContainer.innerHTML = nList.map(item => `
-                        <div class="n-item">
-                            <div class="n-item-head">${item.headline}</div>
-                            <div class="n-item-meta">${item.source}</div>
+                // Render Secondary Column
+                const secCol = document.getElementById('n-sec-col');
+                let secHtml = '';
+
+                if (s1) {
+                    secHtml += `
+                        <div class="n-sec-card">
+                            <div class="n-sec-head">${s1.headline}</div>
+                            <div class="n-sec-meta">${s1.source}</div>
                         </div>
-                    `).join('');
-                } else if (listContainer) {
-                    listContainer.innerHTML = '';
+                    `;
                 }
+                if (s2) {
+                    secHtml += `
+                        <div class="n-sec-card">
+                            <div class="n-sec-head">${s2.headline}</div>
+                            <div class="n-sec-meta">${s2.source}</div>
+                        </div>
+                    `;
+                }
+                if (secCol) secCol.innerHTML = secHtml;
             } catch (e) { console.warn(e); }
         }
         go();

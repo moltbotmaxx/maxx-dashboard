@@ -234,30 +234,39 @@ def update_data():
         news_json = json.loads(news_res)
         
         if 'data' in news_json and len(news_json['data']) > 0:
-            story = news_json['data'][0] # Get latest story
+            stories = news_json['data']
             
-            # Map API fields to our format
-            # API: title, sourceTitle, imageUrl (maybe?), summary
-            # We need: tag, headline, image_url, source
-            
-            # Check for image (the API response I saw didn't have imageUrl in the root of the story object, 
-            # might need to check if it exists or use a default if missing. 
-            # The previous sample output didn't show imageUrl clearly in the truncated view, 
-            # but usually these APIs have it. If not, we keep the placeholder or try to find one.)
-            # Let's assume 'imageUrl' might be there or we use a fallback.
-            
-            img = story.get('imageUrl')
-            if not img:
-                # Fallback AI image if no image provided
-                img = "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800"
-            
-            news_data['news'] = {
-                "tag": story.get('titleLabel', 'AI News'),
-                "headline": story.get('title', 'No headlines available'),
-                "image_url": img,
-                "source": story.get('sourceTitle', 'Actually Relevant'),
-                "summary": story.get('summary', '')
+            # Helper to safely get story data
+            def get_story_data(s):
+                return {
+                    "headline": s.get('title', 'No Title'),
+                    "source": s.get('source', {}).get('name', 'Unknown Source'),
+                    "time": "Today", 
+                    "image_url": s.get('imageUrl') 
+                }
+
+            # 1. Featured Story (Top 1)
+            feat = stories[0]
+            featured_story = {
+                "tag": "Top Story", 
+                "headline": feat.get('title', 'No Title'),
+                "image_url": feat.get('imageUrl', 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800'),
+                "source": feat.get('source', {}).get('name', 'Unknown Source'),
+                "summary": feat.get('summary', '')
             }
+            
+            # 2. Secondary Stories (Next 2)
+            sec_1 = get_story_data(stories[1]) if len(stories) > 1 else None
+            sec_2 = get_story_data(stories[2]) if len(stories) > 2 else None
+
+            news_data = {
+                "news": {
+                    "featured": featured_story,
+                    "secondary_1": sec_1,
+                    "secondary_2": sec_2
+                }
+            }
+            print(f"News updated: {featured_story['headline']}")
             print(f"News updated: {story.get('title')}")
         else:
              print("No news stories found.")
