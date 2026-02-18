@@ -45,23 +45,26 @@ def update():
         api_url = (
             'https://api.open-meteo.com/v1/forecast'
             '?latitude=10.0163&longitude=-84.2116'
-            '&current_weather=true'
-            '&hourly=temperature_2m,weathercode,apparent_temperature,relative_humidity_2m'
+            '&current=temperature_2m,wind_speed_10m,weather_code'
+            '&hourly=temperature_2m,weather_code,apparent_temperature,relative_humidity_2m,wind_speed_10m'
             '&daily=temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max'
             '&timezone=America/Costa_Rica'
             '&forecast_days=1'
         )
         res = subprocess.check_output(['curl', '-s', api_url], text=True)
         api = json.loads(res)
-        w = api['current_weather']
-
+        
+        # New API structure
+        c = api['current']
+        w = c # mapping for legacy code below if needed, or update below
+        
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
 
         # Current weather
-        data['weather']['temp_c'] = str(round(w['temperature']))
-        data['weather']['wind_kmh'] = str(round(w['windspeed']))
-        data['weather']['condition'] = code_to_condition(w.get('weathercode', 0))
+        data['weather']['temp_c'] = str(round(c['temperature_2m']))
+        data['weather']['wind_kmh'] = str(round(c['wind_speed_10m']))
+        data['weather']['condition'] = code_to_condition(c.get('weather_code', 0))
 
         # Daily data
         if 'daily' in api:
@@ -87,7 +90,7 @@ def update():
         # Hourly forecast (next 3 slots: +3h, +6h, +9h from now)
         if 'hourly' in api:
             hourly_temps = api['hourly'].get('temperature_2m', [])
-            hourly_codes = api['hourly'].get('weathercode', [])
+            hourly_codes = api['hourly'].get('weather_code', [])
             hourly_times = api['hourly'].get('time', [])
             forecast = []
             for offset in [3, 6, 9]:
