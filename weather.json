@@ -1,0 +1,16 @@
+{
+  "weather": {
+    "temp_c": "22",
+    "wind_kmh": "9",
+    "condition": "Cielo Despejado",
+    "bg_image": "images/weather_night.png",
+    "theme": "night",
+    "icon": "\ud83c\udf11",
+    "max_temp_c": "32",
+    "min_temp_c": "20",
+    "uv_index": "9",
+    "prob_rain": "3",
+    "feels_like_c": "22",
+    "humidity": "64"
+  }
+}

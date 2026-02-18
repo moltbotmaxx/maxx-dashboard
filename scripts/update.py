@@ -8,6 +8,7 @@ from datetime import datetime
 WORKSPACE = "/Users/maxx/.openclaw/workspace"
 PROJECT_DIR = os.path.join(WORKSPACE, "projects", "smart-frame")
 DATA_FILE = os.path.join(PROJECT_DIR, "data.json")
+WEATHER_FILE = os.path.join(PROJECT_DIR, "weather.json")
 HTML_FILE = os.path.join(PROJECT_DIR, "index.html")
 FTP_HOST = "192.168.100.12"
 FTP_PORT = "2221"
@@ -41,6 +42,10 @@ def update_data():
     print("Updating data...")
     with open(DATA_FILE, 'r') as f:
         data = json.load(f)
+    
+    # Initialize separate weather dict
+    weather_data = { "weather": {} }
+    w = weather_data['weather']
 
     # Fetch weather with full hourly + daily data
     try:
@@ -102,9 +107,9 @@ def update_data():
         
         c = api['current']
         
-        data['weather']['temp_c'] = str(round(c['temperature_2m']))
-        data['weather']['wind_kmh'] = str(round(c['wind_speed_10m']))
-        data['weather']['condition'] = code_to_condition(c.get('weather_code', 0))
+        w['temp_c'] = str(round(c['temperature_2m']))
+        w['wind_kmh'] = str(round(c['wind_speed_10m']))
+        w['condition'] = code_to_condition(c.get('weather_code', 0))
         
         # --- BACKGROUND & THEME LOGIC ---
         code = c.get('weather_code', 0)
@@ -129,8 +134,8 @@ def update_data():
             bg_image = "images/weather_night.png"
             theme = "night"
             
-        data['weather']['bg_image'] = bg_image
-        data['weather']['theme'] = theme
+        w['bg_image'] = bg_image
+        w['theme'] = theme
 
         # --- ICON LOGIC (Sun vs Moon Phase) ---
         # Calculate approximate moon phase since API might not give it directly in this call easily without checking docs for 'daily=moon_phase' compatibility
@@ -155,26 +160,26 @@ def update_data():
             return "🌘" # Waning Crescent
 
         if is_day == 0 and code in [0, 1]:  # Clear/Mainly Clear at night
-             data['weather']['icon'] = get_moon_phase_icon()
+             w['icon'] = get_moon_phase_icon()
         else:
-             data['weather']['icon'] = code_to_icon(code)
+             w['icon'] = code_to_icon(code)
 
         # Daily
         if 'daily' in api:
             d = api['daily']
-            data['weather']['max_temp_c'] = str(round(d['temperature_2m_max'][0]))
-            data['weather']['min_temp_c'] = str(round(d['temperature_2m_min'][0]))
-            data['weather']['uv_index'] = str(round(d['uv_index_max'][0]))
-            data['weather']['prob_rain'] = str(round(d['precipitation_probability_max'][0]))
+            w['max_temp_c'] = str(round(d['temperature_2m_max'][0]))
+            w['min_temp_c'] = str(round(d['temperature_2m_min'][0]))
+            w['uv_index'] = str(round(d['uv_index_max'][0]))
+            w['prob_rain'] = str(round(d['precipitation_probability_max'][0]))
 
         # Feels like + humidity from hourly
         current_hour = datetime.now().hour
         if 'hourly' in api:
             h = api['hourly']
             if 'apparent_temperature' in h and current_hour < len(h['apparent_temperature']):
-                data['weather']['feels_like_c'] = str(round(h['apparent_temperature'][current_hour]))
+                w['feels_like_c'] = str(round(h['apparent_temperature'][current_hour]))
             if 'relative_humidity_2m' in h and current_hour < len(h['relative_humidity_2m']):
-                data['weather']['humidity'] = str(round(h['relative_humidity_2m'][current_hour]))
+                w['humidity'] = str(round(h['relative_humidity_2m'][current_hour]))
 
             # Hourly forecast (next 3 time slots)
             hourly_temps = h.get('temperature_2m', [])
@@ -191,7 +196,7 @@ def update_data():
                         "temp": str(round(hourly_temps[idx]))
                     })
             if forecast:
-                data['weather']['hourly_forecast'] = forecast
+                w['hourly_forecast'] = forecast
 
     except Exception as e:
         print(f"Weather update failed: {e}")
@@ -202,10 +207,19 @@ def update_data():
     data['maxx_status']['last_update_time'] = now.strftime("%H:%M")
 
     # Save
+    # Remove weather from main data if exists for cleanup
+    if 'weather' in data:
+        del data['weather']
+
+    # Save Weather Data
+    with open(WEATHER_FILE, 'w') as f:
+        json.dump(weather_data, f, indent=2)
+
+    # Save Main Data (Status, etc.)
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=2)
 
-    return data
+    return data, weather_data
 
 def generate_and_upload():
     # Capture current counter

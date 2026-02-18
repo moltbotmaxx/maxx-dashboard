@@ -858,8 +858,17 @@
         }
         async function go() {
             try {
-                var r = await fetch('data.json?' + Date.now()); if (!r.ok) return;
-                var d = await r.json(), w = d.weather;
+                // Fetch both data sources in parallel
+                const [rData, rWeather] = await Promise.all([
+                    fetch('data.json?' + Date.now()),
+                    fetch('weather.json?' + Date.now())
+                ]);
+
+                if (!rData.ok || !rWeather.ok) return;
+
+                const d = await rData.json();
+                const wData = await rWeather.json();
+                const w = wData.weather;
                 document.getElementById('w-loc').textContent = w.location;
                 document.getElementById('w-cond').textContent = w.condition;
                 document.getElementById('w-temp').textContent = w.temp_c;

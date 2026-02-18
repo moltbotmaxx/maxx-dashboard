@@ -1,33 +1,4 @@
 {
-  "weather": {
-    "location": "Alajuela",
-    "condition": "Cielo Despejado",
-    "temp_c": "20",
-    "feels_like_c": "20",
-    "max_temp_c": "32",
-    "min_temp_c": "20",
-    "wind_kmh": "8",
-    "humidity": "71",
-    "uv_index": "9",
-    "prob_rain": "0",
-    "hourly_forecast": [
-      {
-        "time": "4AM",
-        "icon": "\u2600\ufe0f",
-        "temp": "20"
-      },
-      {
-        "time": "7AM",
-        "icon": "\u2600\ufe0f",
-        "temp": "22"
-      },
-      {
-        "time": "10AM",
-        "icon": "\u2600\ufe0f",
-        "temp": "30"
-      }
-    ]
-  },
   "instagram": {
     "username": "@chatgptricks",
     "followers": "2.45M",
@@ -43,7 +14,7 @@
     "telegram_status": "\u2713",
     "whatsapp_status": "\u2713",
     "label": "Maxx Moltbot",
-    "last_update_time": "01:13",
+    "last_update_time": "23:50",
     "mood": "\ud83d\ude80"
   },
   "news": {
