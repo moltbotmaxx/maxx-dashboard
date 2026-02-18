@@ -28,7 +28,7 @@
         /* ═══ BENTO GRID ═══ */
         .bento {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(6, 1fr);
             grid-template-rows: 1fr 1fr;
             width: 1024px;
             height: 640px;
@@ -735,9 +735,9 @@
 
 <body>
     <div class="bento">
+        <!-- WEATHER (Span 3 = 50%) -->
+        <div class="card-weather" id="card-weather" style="grid-column: span 3;" data-theme="night">
 
-        <!-- WEATHER -->
-        <div class="card-weather" id="card-weather" data-theme="night">
             <div class="w-bg" id="w-bg" style="background-image:url('images/weather_sunny.png')"></div>
             <div class="w-over"></div>
             <div class="w-inner">
@@ -796,8 +796,8 @@
             </div>
         </div>
 
-        <!-- MOLTBOT -->
-        <div class="card-moltbot">
+        <!-- MOLTBOT (Span 3 = 50%) -->
+        <div class="card-moltbot" style="grid-column: span 3;">
             <div class="m-inner">
                 <div class="m-header">
                     <div class="m-title">OpenClaw Agent</div>
@@ -832,8 +832,8 @@
             </div>
         </div>
 
-        <!-- INSTAGRAM -->
-        <div class="card-ig">
+        <!-- INSTAGRAM (Span 2 = 33%) -->
+        <div class="card-ig" style="grid-column: span 2;">
             <div class="ig-inner">
                 <div class="ig-top">
                     <div class="ig-logo">
