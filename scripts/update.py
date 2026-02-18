@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Configuration
 WORKSPACE = "/Users/maxx/.openclaw/workspace"
-PROJECT_DIR = os.path.join(WORKSPACE, "smart-frame")
+PROJECT_DIR = os.path.join(WORKSPACE, "projects", "smart-frame")
 DATA_FILE = os.path.join(PROJECT_DIR, "data.json")
 HTML_FILE = os.path.join(PROJECT_DIR, "index.html")
 FTP_HOST = "192.168.100.12"
