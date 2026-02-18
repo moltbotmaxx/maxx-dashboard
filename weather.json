@@ -1,17 +1,17 @@
 {
   "weather": {
-    "temp_c": "21",
-    "wind_kmh": "10",
-    "condition": "Clear",
+    "temp_c": "20",
+    "wind_kmh": "19",
+    "condition": "Patchy rain nearby",
     "bg_image": "images/weather_night.png",
     "theme": "night",
     "icon": "🌑",
-    "max_temp_c": "32",
-    "min_temp_c": "21",
-    "uv_index": "9",
-    "prob_rain": "3",
-    "feels_like_c": "22",
-    "humidity": "64",
+    "max_temp_c": "28",
+    "min_temp_c": "20",
+    "uv_index": "0",
+    "prob_rain": "100",
+    "feels_like_c": "20",
+    "humidity": "89",
     "hourly_forecast": [
       {
         "time": "4AM",
