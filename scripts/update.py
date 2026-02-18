@@ -267,7 +267,6 @@ def update_data():
                 }
             }
             print(f"News updated: {featured_story['headline']}")
-            print(f"News updated: {story.get('title')}")
         else:
              print("No news stories found.")
 
