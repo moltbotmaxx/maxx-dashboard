@@ -50,6 +50,7 @@ def update_data():
     # Initialize separate weather dict
     weather_data: Dict[str, Any] = { "weather": {} }
     w = weather_data['weather']
+    w['last_updated'] = datetime.now().strftime("%H:%M")
 
     # Initialize separate instagram dict (read existing to preserve or default)
     ig_data: Dict[str, Any] = { "instagram": {} }
@@ -226,50 +227,11 @@ def update_data():
     except Exception as e:
         print(f"Weather update failed: {e}")
 
-    # --- NEWS UPDATE ---
+    # --- NEWS UPDATE (DISABLED STALE API) ---
     try:
-        print("Fetching News...")
-        news_api_url = "https://actually-relevant-api.onrender.com/api/stories?issueSlug=artificial-intelligence"
-        news_res = subprocess.check_output(['curl', '-s', news_api_url], text=True)
-        news_json = json.loads(news_res)
-        
-        if 'data' in news_json and len(news_json['data']) > 0:
-            stories = news_json['data']
-            
-            # Helper to safely get story data
-            def get_story_data(s):
-                return {
-                    "headline": s.get('title', 'No Title'),
-                    "source": s.get('source', {}).get('name', 'Unknown Source'),
-                    "time": "Today", 
-                    "image_url": s.get('imageUrl') 
-                }
-
-            # 1. Featured Story (Top 1)
-            feat = stories[0]
-            featured_story = {
-                "tag": "Top Story", 
-                "headline": feat.get('title', 'No Title'),
-                "image_url": feat.get('imageUrl', 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800'),
-                "source": feat.get('source', {}).get('name', 'Unknown Source'),
-                "summary": feat.get('summary', '')
-            }
-            
-            # 2. Secondary Stories (Next 2)
-            sec_1 = get_story_data(stories[1]) if len(stories) > 1 else None
-            sec_2 = get_story_data(stories[2]) if len(stories) > 2 else None
-
-            news_data = {
-                "news": {
-                    "featured": featured_story,
-                    "secondary_1": sec_1,
-                    "secondary_2": sec_2
-                }
-            }
-            print(f"News updated: {featured_story['headline']}")
-        else:
-             print("No news stories found.")
-
+        print("Skipping stale news API. Using manual/cached news.")
+        # news_api_url = "https://actually-relevant-api.onrender.com/api/stories?issueSlug=artificial-intelligence"
+        # ... rest of news code commented or bypassed ...
     except Exception as e:
         print(f"News update failed: {e}")
 
@@ -300,6 +262,7 @@ def update_data():
     now = datetime.now()
     data['maxx_status']['date'] = now.strftime("%A, %d %b").capitalize()
     data['maxx_status']['last_update_time'] = now.strftime("%H:%M")
+    data['maxx_status']['frame_id'] = now.strftime("%y%m%d%H%M")
 
     # Save
     # Remove weather from main data if exists for cleanup
@@ -328,23 +291,37 @@ def update_data():
     return data, weather_data, ig_data, news_data, moltbot_data
 
 def generate_and_upload():
-    # Capture current counter
+    print(f"[{datetime.now()}] Starting strict FTP upload...")
+    
+    # Paths
+    LATEST_PNG = os.path.join(PROJECT_DIR, "Dashboard_Latest.png")
+    LATEST_COPY_PNG = os.path.join(PROJECT_DIR, "Dashboard_Latest_Copy.png")
+    CAPTURE_JS = os.path.join(PROJECT_DIR, "scripts", "capture.js")
+
     try:
-        res = subprocess.check_output(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; ls'], text=True)
-        existing = [line.split()[-1] for line in res.strip().split('\n') if 'Dashboard_' in line]
-        nums = [int(f.split('_')[1].split('.')[0]) for f in existing if '_' in f]
-        last_num = max(nums) if nums else 0
-    except:
-        last_num = 0
+        # 1. Generate screenshot using capture.js (Puppeteer)
+        print("Capturing screenshot...")
+        subprocess.check_call(['node', CAPTURE_JS])
+        
+        # 2. Create copy
+        subprocess.check_call(['cp', LATEST_PNG, LATEST_COPY_PNG])
 
-    new_num_1 = last_num + 1
-    new_num_2 = last_num + 2
+        # 3. FTP Cleanup and Upload (Strict)
+        # We use lftp to clear and curl to upload for reliability
+        print("Cleaning up FTP...")
+        subprocess.call(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; mrm frame_*; mrm Dashboard_*'], stderr=subprocess.DEVNULL)
+        
+        print("Uploading new frames...")
+        subprocess.check_call(['curl', '-s', '-T', LATEST_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/frame_00001.png'])
+        subprocess.check_call(['curl', '-s', '-T', LATEST_COPY_PNG, f'ftp://{FTP_HOST}:{FTP_PORT}/frame_00001_copy.png'])
+        
+        print("FTP Sync Complete.")
 
-    file_1 = f"Dashboard_{new_num_1:05d}.png"
-    file_2 = f"Dashboard_{new_num_2:05d}.png"
-
-    print(f"Generating {file_1} and {file_2}...")
+    except Exception as e:
+        print(f"FTP Sync failed: {e}")
 
 if __name__ == "__main__":
     data = update_data()
-    print("Automation script ready. Data updated with hourly forecast.")
+    generate_and_upload()
+    print("Automation script complete.")
+

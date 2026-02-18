@@ -142,6 +142,25 @@
             font-weight: 600;
         }
 
+        .w-updated {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        
+        .frame-id {
+            position: absolute;
+            bottom: 4px;
+            right: 10px;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.1);
+            font-family: 'Courier New', monospace;
+            z-index: 100;
+        }
+
         .w-bottom {
             display: flex;
             justify-content: space-between;
@@ -735,6 +754,7 @@
 
 <body>
     <div class="bento">
+        <div class="frame-id" id="frame-id">FID: 00000</div>
         <!-- WEATHER (Span 3 = 50%) -->
         <div class="card-weather" id="card-weather" style="grid-column: span 3;" data-theme="night">
 
@@ -754,6 +774,7 @@
                     <div class="w-meta">
                         <div class="w-feels">Sensación <span id="w-feels">26</span>°</div>
                         <div class="w-mm" id="w-mm">↑ 30° ↓ 20°</div>
+                        <div class="w-updated">Updated: <span id="w-updated">--:--</span></div>
                     </div>
                 </div>
                 <div class="w-bottom">
@@ -936,6 +957,8 @@
                 document.getElementById('w-uv').textContent = w.uv_index;
                 document.getElementById('w-prob').textContent = w.prob_rain + '%';
                 document.getElementById('w-icon').textContent = w.icon || pickI(w.condition);
+                document.getElementById('w-updated').textContent = w.last_updated || '--:--';
+                document.getElementById('frame-id').textContent = 'FID: ' + (d.maxx_status.frame_id || Date.now().toString().slice(-5));
                 // Background & Theme now come from server (Python)
                 if (w.bg_image) document.getElementById('w-bg').style.backgroundImage = "url('" + w.bg_image + "')";
                 if (w.theme) document.getElementById('card-weather').setAttribute('data-theme', w.theme);
