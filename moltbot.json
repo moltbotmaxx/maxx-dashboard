@@ -13,9 +13,9 @@
       "last_post_cdn_url": "https://raw.githubusercontent.com/moltbotmaxx/memes/master/latest.png"
     },
     "state": {
-      "system_mood": "Synchronizing with Alajuela weather 🌦️",
+      "system_mood": "Preparing frame capture... 📸",
       "logic_mode": "Thinking",
-      "last_action": "Set weather location to Alajuela"
+      "last_action": "Dashboard sync triggered"
     }
   }
 }
