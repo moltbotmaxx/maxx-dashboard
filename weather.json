@@ -1,7 +1,7 @@
 {
   "weather": {
     "temp_c": "20",
-    "wind_kmh": "18",
+    "wind_kmh": "17",
     "condition": "Patchy rain nearby",
     "bg_image": "images/weather_night.png",
     "theme": "night",
@@ -11,7 +11,7 @@
     "uv_index": "0",
     "prob_rain": "100",
     "feels_like_c": "20",
-    "humidity": "91",
+    "humidity": "92",
     "hourly_forecast": [
       {
         "time": "6AM",

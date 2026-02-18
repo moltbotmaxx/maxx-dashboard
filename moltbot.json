@@ -1,9 +1,9 @@
 {
   "moltbot": {
     "system": {
-      "current_model": "Gemini 2.0 Pro Experimental",
-      "token_usage_daily": "142k / 1M",
-      "context_usage": "45%",
+      "current_model": "google-antigravity/gemini-3-flash",
+      "token_usage_daily": "Managed by Agent",
+      "context_usage": "Dynamic",
       "active_subagents": [
         "Twitter Crawler",
         "News Fetcher"
@@ -16,9 +16,9 @@
       "last_post_cdn_url": "https://raw.githubusercontent.com/moltbotmaxx/memes/master/latest.png"
     },
     "state": {
-      "system_mood": "Final synchronization cycle 🦞✨",
+      "system_mood": "Active & Persistent 🦞",
       "logic_mode": "Thinking",
-      "last_action": "Manual dashboard refresh"
+      "last_action": "Posted to Instagram: joke"
     }
   }
 }
