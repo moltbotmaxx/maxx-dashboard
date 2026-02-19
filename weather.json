@@ -1,28 +1,23 @@
 {
   "weather": {
-    "last_updated": "17:56",
+    "last_updated": "18:26",
     "temp_c": "24",
-    "wind_kmh": "6",
+    "wind_kmh": "4",
     "condition": "Chubascos",
-    "bg_image": "images/weather_rainy.png",
-    "theme": "rain",
+    "bg_image": "images/weather_night.png",
+    "theme": "night",
     "icon": "\ud83c\udf26\ufe0f",
     "max_temp_c": "32",
     "min_temp_c": "21",
     "uv_index": "9",
     "prob_rain": "10",
-    "feels_like_c": "28",
-    "humidity": "72",
+    "feels_like_c": "27",
+    "humidity": "77",
     "hourly_forecast": [
       {
-        "time": "8PM",
-        "icon": "\ud83c\udf24\ufe0f",
+        "time": "9PM",
+        "icon": "\u2600\ufe0f",
         "temp": "22"
-      },
-      {
-        "time": "11PM",
-        "icon": "\ud83c\udf24\ufe0f",
-        "temp": "21"
       }
     ]
   }
