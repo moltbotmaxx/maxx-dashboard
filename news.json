@@ -2,19 +2,19 @@
   "news": {
     "featured": {
       "tag": "Latest",
-      "headline": "YouTube\u2019s latest experiment brings its conversational AI tool to TVs",
+      "headline": "Why these startup CEOs don\u2019t think AI will replace human roles",
       "image_url": "https://techcrunch.com/wp-content/uploads/2026/02/RAM_9821.jpg",
       "source": "TechCrunch",
-      "summary": "YouTube is testing conversational AI on smart TVs, allowing viewers to ask the assistant questions related to the video they're watching on the big screen...."
+      "summary": "The CEOs of Read AI and Lucidya told TechCrunch at Web Summit Qatar that they see AI tools replacing tasks, rather than workers...."
     },
     "secondary_1": {
-      "headline": "Reddit is testing a new AI search feature for shopping",
+      "headline": "YouTube\u2019s latest experiment brings its conversational AI tool to TVs",
       "source": "TechCrunch",
       "time": "New",
       "image_url": null
     },
     "secondary_2": {
-      "headline": "OpenAI reportedly finalizing $100B deal at more than $850B valuation",
+      "headline": "Reddit is testing a new AI search feature for shopping",
       "source": "TechCrunch",
       "time": "New",
       "image_url": null
