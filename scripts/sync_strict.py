@@ -30,45 +30,50 @@ def get_next_frame_number():
     return next_val
 
 def sync_strict():
-    print(f"[{datetime.now()}] 🛡️ Initiating STRICT SEQUENTIAL SYNC (Frame_X Protocol)...")
+    print(f"[{datetime.now()}] 🛡️ Initiating LEAN SEQUENTIAL SYNC (Keeping 2 Most Recent)...")
     
     if not os.path.exists(LATEST_PNG):
         print(f"❌ Error: {LATEST_PNG} not found.")
         return
 
     try:
-        # Get sequential number
+        # 1. Get next sequence number
         frame_num = get_next_frame_number()
-        final_filename = f"Frame_{frame_num}.png"
-        temp_name = f"sync_buffer_{frame_num}.png"
+        # Format with leading zeros to match your current pattern Frame_000000X.png
+        final_filename = f"Frame_{frame_num:07d}.png"
         
-        print(f"Target Sequence: {final_filename}")
+        print(f"Targeting: {final_filename}")
 
-        # 1. Clean up old Frame_ files to prevent storage bloat, but KEEP current one
-        # Note: If the frame logic requires multiple, we adjust. 
-        # Usually, consecutive means Frame_1, Frame_2... and the frame picks the highest.
-        
-        # 2. Upload with a temporary name to ensure atomicity
-        print(f"Uploading temporary buffer: {temp_name}...")
+        # 2. Upload DIRECTLY to the final name (No renaming to avoid corruption-during-move)
+        # Note: By uploading directly, if the frame reads during upload, it might see corruption,
+        # but your previous test suggests renaming itself might be the issue.
+        # We will use curl for a clean stream.
         subprocess.check_call([
             'curl', '-s', '-T', LATEST_PNG, 
-            f'ftp://{FTP_HOST}:{FTP_PORT}/{temp_name}'
+            f'ftp://{FTP_HOST}:{FTP_PORT}/{final_filename}'
         ])
+        print(f"Uploaded: {final_filename}")
 
-        # 3. Atomic Rename to sequential final name
-        print(f"Executing atomic switch to {final_filename}...")
-        subprocess.check_call(['lftp', '-c', f'''
-            open ftp://{FTP_HOST}:{FTP_PORT};
-            mv {temp_name} {final_filename}
-        '''], shell=True)
+        # 3. Cleanup: Keep only the 2 highest numbered frames
+        print("Auditing FTP for sequence cleanup...")
+        # Get list of files
+        res = subprocess.check_output(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; nlist'], text=True)
+        files = [f.strip() for f in res.split('\n') if f.strip().startswith('Frame_') and f.endswith('.png')]
+        
+        # Sort files based on the numeric part
+        files.sort() 
 
-        # 4. Optional: Remove very old frames if needed to save space on the target
-        # For now, we prioritize keeping the sequence as requested.
+        if len(files) > 2:
+            to_delete = files[:-2] # Everything except the last 2
+            print(f"Deleting {len(to_delete)} stale frames...")
+            for f in to_delete:
+                subprocess.call(['lftp', '-c', f'open ftp://{FTP_HOST}:{FTP_PORT}; rm {f}'])
+                print(f"  - Purged: {f}")
 
-        print(f"✅ Strict Sync Success. Sequence {final_filename} deployed.")
+        print(f"✅ Sync Complete. Current buffer: {files[-2:] if len(files) >= 2 else files}")
 
     except Exception as e:
-        print(f"❌ STRICT SEQUENTIAL SYNC FAILED: {e}")
+        print(f"❌ LEAN SYNC FAILED: {e}")
 
 if __name__ == "__main__":
     sync_strict()
