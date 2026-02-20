@@ -1,6 +1,6 @@
 {
   "weather": {
-    "last_updated": "21:56",
+    "last_updated": "22:03",
     "temp_c": "21",
     "wind_kmh": "5",
     "condition": "Parcialmente Nublado",
@@ -11,7 +11,7 @@
     "min_temp_c": "20",
     "uv_index": "8",
     "prob_rain": "25",
-    "feels_like_c": "25",
-    "humidity": "85"
+    "feels_like_c": "23",
+    "humidity": "84"
   }
 }
