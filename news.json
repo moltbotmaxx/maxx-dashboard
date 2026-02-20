@@ -2,19 +2,19 @@
   "news": {
     "featured": {
       "tag": "Latest",
-      "headline": "Why these startup CEOs don\u2019t think AI will replace human roles",
+      "headline": "Google\u2019s new Gemini Pro model has record benchmark scores\u2014again",
       "image_url": "https://techcrunch.com/wp-content/uploads/2026/02/RAM_9821.jpg",
       "source": "TechCrunch",
-      "summary": "The CEOs of Read AI and Lucidya told TechCrunch at Web Summit Qatar that they see AI tools replacing tasks, rather than workers...."
+      "summary": "Gemini 3.1 Pro promises a Google LLM capable of handling more complex forms of work. ..."
     },
     "secondary_1": {
-      "headline": "YouTube\u2019s latest experiment brings its conversational AI tool to TVs",
+      "headline": "Nvidia deepens early-stage push into India\u2019s AI startup ecosystem",
       "source": "TechCrunch",
       "time": "New",
       "image_url": null
     },
     "secondary_2": {
-      "headline": "Reddit is testing a new AI search feature for shopping",
+      "headline": "Why these startup CEOs don\u2019t think AI will replace human roles",
       "source": "TechCrunch",
       "time": "New",
       "image_url": null
