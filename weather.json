@@ -1,32 +1,32 @@
 {
   "weather": {
-    "last_updated": "09:26",
+    "last_updated": "09:56",
     "temp_c": "26",
-    "wind_kmh": "8",
+    "wind_kmh": "9",
     "condition": "Cielo Despejado",
     "bg_image": "images/weather_sunny.png",
     "theme": "day",
     "icon": "\u2600\ufe0f",
     "max_temp_c": "28",
-    "min_temp_c": "19",
+    "min_temp_c": "18",
     "uv_index": "8",
-    "prob_rain": "40",
+    "prob_rain": "73",
     "feels_like_c": "28",
-    "humidity": "71",
+    "humidity": "69",
     "hourly_forecast": [
       {
         "time": "12PM",
-        "icon": "\u2601\ufe0f",
-        "temp": "28"
+        "icon": "\u26c5",
+        "temp": "27"
       },
       {
         "time": "3PM",
         "icon": "\u26c8\ufe0f",
-        "temp": "26"
+        "temp": "25"
       },
       {
         "time": "6PM",
-        "icon": "\ud83c\udf26\ufe0f",
+        "icon": "\u26c8\ufe0f",
         "temp": "23"
       }
     ]
