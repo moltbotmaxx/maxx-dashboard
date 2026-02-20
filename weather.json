@@ -1,6 +1,6 @@
 {
   "weather": {
-    "last_updated": "02:56",
+    "last_updated": "03:26",
     "temp_c": "19",
     "wind_kmh": "7",
     "condition": "Parcialmente Nublado",
@@ -15,19 +15,19 @@
     "humidity": "85",
     "hourly_forecast": [
       {
-        "time": "5AM",
-        "icon": "\ud83c\udf24\ufe0f",
+        "time": "6AM",
+        "icon": "\u2600\ufe0f",
         "temp": "19"
       },
       {
-        "time": "8AM",
-        "icon": "\ud83c\udf24\ufe0f",
-        "temp": "24"
+        "time": "9AM",
+        "icon": "\u2600\ufe0f",
+        "temp": "25"
       },
       {
-        "time": "11AM",
-        "icon": "\ud83c\udf24\ufe0f",
-        "temp": "26"
+        "time": "12PM",
+        "icon": "\u26c5",
+        "temp": "28"
       }
     ]
   }
