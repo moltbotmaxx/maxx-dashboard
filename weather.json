@@ -1,12 +1,12 @@
 {
   "weather": {
-    "last_updated": "21:56",
+    "last_updated": "22:24",
     "temp_c": "22",
     "wind_kmh": "2",
     "condition": "Parcialmente Nublado",
     "bg_image": "images/weather_night.png",
     "theme": "night",
-    "icon": "\u2601\ufe0f",
+    "icon": "\u26c5",
     "max_temp_c": "27",
     "min_temp_c": "19",
     "uv_index": "8",
